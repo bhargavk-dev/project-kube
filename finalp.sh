@@ -4,5 +4,5 @@ set -xe
 sudo apt-get update
 sudo apt-get -y install ansible
 sudo apt-get -y install git
-git clone 
-cd ansible-play; sudo ansible-playbook main.yml
+git clone "https://github.com/bhargavk-dev/project-kube.git"
+cd project-kube; sudo ansible-playbook qubeplaybook.yml
