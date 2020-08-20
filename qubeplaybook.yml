@@ -1,46 +1,50 @@
+
 ---
 - hosts: localhost
-  become: yes
+  become: true
   tasks:
    - name: install Docker
      apt:
-       name: docker.io
+       name: docker
        state: present
        update_cache: true
-
-   - name: install APT Transport HTTPS
-     apt:
-       name: apt-transport-https
-       state: present
-
-   - name: add Kubernetes apt-key
-     apt_key:
-       url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-       state: present
-
-   - name: add Kubernetes APT repository
-     apt_repository:
-      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+   - name: start Docker
+     service:
+       name: docker
+       state: started
+   - name: ensure net.bridge.bridge-nf-call-ip6tables is set to 1
+     sysctl:
+      name: net.bridge.bridge-nf-call-ip6tables
+      value: 1
       state: present
-      filename: 'kubernetes'
-
+   - name: ensure net.bridge.bridge-nf-call-iptables is set to 1
+sysctl:
+      name: net.bridge.bridge-nf-call-iptables
+      value: 1
+      state: present
+   - name: add Kubernetes apt_repository
+     get_url:
+      url: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+      dest: ./
    - name: install kubelet
      apt:
-       name: kubelet
-       state: present
-       update_cache: true
-
+        name: kubelet
+        state: present
+        update_cache: true
    - name: install kubeadm
-     apt:
-       name: kubeadm
-       state: present
-
-- hosts: localhost
+      apt:
+        name: kubeadm
+        state: present
+   - name: start kubelet
+     service:
+       name: kubelet
+       enabled: yes
+       state: started
+- hosts: master
   become: yes
   tasks:
    - name: install kubectl
      apt:
-       name: kubectl
-       state: present
-       force: yes
-                                                                      44,17         Bot
+        name: kubectl
+        state: present
+        allow_downgrade: yes
